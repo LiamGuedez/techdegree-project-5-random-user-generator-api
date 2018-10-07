@@ -1,26 +1,22 @@
+const getEmployeeData =
+    new Promise(function(resolve, reject)
+    {
+        const url = 'https://randomuser.me/api/?results=12&inc=picture,name,email,location,cell,dob';
+        const callback =
+          function(response)
+          {
+            const employees = response.results;
+            resolve(employees);
+          };
+        $.get(url, callback);
+    });
 
-  function sendAJAX() {
-      var array = [];
-      var url = 'https://randomuser.me/api/?results=12&inc=picture,name,email,location,cell,dob';
-      var data = {};
-      var callback = function(response) {
-        array = response.results;
-        console.log(array);
-        console.log(response.results);
-      };
-      $.get(url, data, callback);
-      console.log(array);
-      return array;
-  }
+const formatEmployeeData = employees =>
+{
+  let person1 = employees[0];
+  return employees;
+}
 
-  // // //Image
-  //
- // // // Name
- // // // Email
- // // // City or location
- // // // Cell Number
- // // // Detailed Address, including street name and number, state or country, and post code.
- // // // Birthday
-
-  let anarray = sendAJAX();
-  console.log(anarray);
+getEmployeeData
+  .then(employees => formatEmployeeData(employees))
+  .then(employees => console.log(employees));
