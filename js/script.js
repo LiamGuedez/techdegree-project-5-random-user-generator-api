@@ -188,7 +188,7 @@ const createModalWindows = employees =>
       }
     });
   }
-
+    //if card is clicked, make modal window for that employee
     document.querySelector('#gallery').addEventListener('click', (event)=>
     {
       if (event.target.id.includes('emp'))
@@ -212,20 +212,58 @@ const addSearchFeature = data =>
   const inDirectory = items =>
   {
     items = items.split(' ');
-    let id = null;
-    employees.forEach(employee =>
+    let foundItems = [];
+    items.forEach(item => foundItems.push(false));
+
+    const allItemsFound = foundItems =>
     {
-      console.log(items);
-      items.forEach(item =>
+      let allFound = true;
+      foundItems.forEach(item =>
       {
-        if ((employee.name.first === item) || (employee.name.last === item))
-        {
-          id = employee.id;
-          console.log(employee.id);
-        }
+        if(item === false)
+         allFound = allFound && false;
       });
-    });
+      return allFound;
+    }
+
+    let id = null;
+    for(let x = 0; x < items.length ; x++)
+    {
+      for(let y = 0; y < employees.length ; y++)
+      {
+        let firstNameMatch = (employees[y].name.first === items[x]);
+        let lastNameMatch = (employees[y].name.last === items[x]);
+        let bothNamesMatch = firstNameMatch && lastNameMatch;
+
+        if (bothNamesMatch || firstNameMatch || lastNameMatch)
+        {
+          id = employees[y].id;
+          foundItems[x] = true;
+        }
+
+        if (foundItems[x] && !allItemsFound(foundItems))
+        {
+          id = null;
+        }
+      }
+    }
     return id !== null? id : false;
+  }
+
+  //hides all cards except the one belonging to highlighted employee
+  const highlightEmployee = highlightEmpID =>
+  {
+    // empCard = document.querySelectorAll(`div.${employees[x].id}`);
+    empCards = document.querySelectorAll(`div.card`);
+    empCards.forEach(card => card.style.display = 'flex');
+
+    for(let x = 0 ; x < empCards.length ; x++)
+    {
+      if(empCards[x].id === highlightEmpID)
+        continue;
+      else
+        empCards[x].style.display = 'none';
+    }
   }
 
   //add search bar
@@ -239,17 +277,26 @@ const addSearchFeature = data =>
   const searchField = searchContainer.querySelector('#search-input');
   const searchButton = searchContainer.querySelector('#search-submit');
 
+  //if the search is successful, display the employee
   searchButton.addEventListener('click', (event) =>
   {
     if (event.target.id = 'search-submit')
     {
       const foundEmployee = inDirectory(titleCase(searchField.value));
-      if(foundEmployee)
-        makeWindow(foundEmployee);
-      else
-        alert('Employee not found');
+      foundEmployee ? highlightEmployee(foundEmployee) : alert('Employee not found');
     }
   });
+
+  //if search field is empty, display all the cards
+  searchField.addEventListener('input', (event) =>
+  {
+    if (event.target.value === '')
+    {
+      empCards = document.querySelectorAll(`div.card`);
+      empCards.forEach(card => card.style.display = 'flex');
+    }
+  });
+
 }
 
 getEmployeeData
